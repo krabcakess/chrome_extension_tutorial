@@ -21,7 +21,10 @@
         });
     }
 
+    // Function to add new bookmark 
     const addNewBookmarkEventHandler = async () => {
+
+        // Initialize bookmark
         const currentTime = youtubePlayer.currentTime;
         const newBookmark = {
             time: currentTime,
@@ -30,6 +33,7 @@
 
         currentVideoBookmarks = await fetchBookmarks();
 
+        // Add bookmark to storage and sort by time
         chrome.storage.sync.set({
             [currentVideo]: JSON.stringify([...currentVideoBookmarks, newBookmark].sort((a, b) => a.time - b.time))
         });
@@ -43,23 +47,28 @@
         if (!bookmarkBtnExists) {
             const bookmarkBtn = document.createElement("img");
 
+            // Create bookmark button (source image, class name & title)
             bookmarkBtn.src = chrome.runtime.getURL("assets/bookmark.png");
             bookmarkBtn.className = "ytp-button " + "bookmark-btn";
             bookmarkBtn.title = "Click to bookmark current timestamp";
 
+            // Get YouTube DOM elements
             youtubeLeftControls = document.getElementsByClassName("ytp-left-controls")[0];
             youtubePlayer = document.getElementsByClassName("video-stream")[0];
 
+            // Insert newly created button into left controls
             youtubeLeftControls.appendChild(bookmarkBtn);
             bookmarkBtn.addEventListener("click", addNewBookmarkEventHandler);
 
         };
     }
 
+    // Second function call to mitigate double-check issues
     newVideoLoaded();
 
 })();
 
+// Helper function to convert time into ISO time
 const getTime = t => {
     var date = new Date(0);
     date.setSeconds(t);
